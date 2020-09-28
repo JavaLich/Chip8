@@ -2,7 +2,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <sys/types.h>
-#include <main.h>
 
 #include "Chip8.h"
 

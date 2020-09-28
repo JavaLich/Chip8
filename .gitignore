@@ -1,4 +1,6 @@
 .clangd/
-build/
+Debug/
+Release/
 
 compile_commands.json
+build_commands.sh
