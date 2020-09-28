@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 include_directories(include)
-file(GLOB_RECURSE SOURCES "src/*.cpp" main.cpp)
+file(GLOB_RECURSE SOURCES src/*.cpp main.cpp)
 
 find_package(SDL2 REQUIRED)
 

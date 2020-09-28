@@ -4,8 +4,13 @@
 #include <sys/types.h>
 #include <main.h>
 
+#include "Chip8.h"
+
 int main()
 {
+	Chip8 chip;
+	chip.LoadROM("file");
+
     using std::cerr;
     using std::endl;
 
