@@ -1,2 +1,2 @@
-# Chip8
-Chip8 Emulator
+# Chip8 (WIP)
+Chip8 Emulator 
