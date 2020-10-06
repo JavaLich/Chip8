@@ -12,9 +12,12 @@ public:
 	uint8_t delayTimer{};
 	uint8_t soundTimer{};
 	uint8_t keypad[16]{};
-	uint32_t video[64 * 32]{};
+	uint32_t video[32*64]{};
 	uint16_t opcode;
+	
 
 	void LoadROM(const char* filename);
+
+	Chip8();
 };
 
