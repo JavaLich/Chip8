@@ -40,7 +40,7 @@ int main()
         SDL_RenderPresent(ren);
         SDL_Delay(100);
     }
-
+	
     SDL_DestroyRenderer(ren);
     SDL_DestroyWindow(win);
     SDL_Quit();
