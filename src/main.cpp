@@ -8,7 +8,7 @@
 int main()
 {
 	Chip8 chip;
-	chip.LoadROM("file");
+	chip.load_rom("file");
 
     using std::cerr;
     using std::endl;

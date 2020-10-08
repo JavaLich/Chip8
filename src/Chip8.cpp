@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <cstring>
 #include <fstream>
-#include <iostream>
 
 const uint16_t START_ADDRESS = 0x200;
 const uint16_t FONTSET_ADDERSS = 0x50;
@@ -39,7 +38,7 @@ Chip8::Chip8() {
   std::copy(&fontset[0][0], &fontset[0][0] + NUM_FONTS * FONT_SIZE, &memory[FONTSET_ADDERSS]);
 }
 
-void Chip8::LoadROM(const char *filename) {
+void Chip8::load_rom(const char *filename) {
   std::ifstream file(filename, std::ios::binary);
 
   file.seekg(0, std::ios::end);
@@ -55,6 +54,10 @@ void Chip8::LoadROM(const char *filename) {
   delete[] buffer;
 }
 
+void Chip8::step() {
+  pc += 2;
+}
+
 void Chip8::OP_00E0() {
   std::memset(video, 0, sizeof(video));
 }
@@ -65,5 +68,52 @@ void Chip8::OP_00EE() {
 }
 
 void Chip8::OP_1nnn() {
-  pc = 0x0FFF & opcode;
+  pc = opcode & 0x0FFFu;
+}
+
+void Chip8::OP_2nnn() {
+  stack[sp] = pc;
+  pc = opcode & 0x0FFFu;
+  sp++;
+}
+
+void Chip8::OP_3xkk() {
+  uint8_t kk = opcode & 0x00FFu;
+
+  if (registers[(opcode & 0x0F00u) >> 8] == kk) {
+    pc += 2;
+  }
+}
+
+void Chip8::OP_4xkk() {
+  uint8_t kk = opcode & 0x00FFu;
+
+  if (registers[(opcode & 0x0F00u) >> 8] != kk) {
+    pc += 2;
+  }
+}
+
+void Chip8::OP_5xy0() {
+  uint8_t Vx = (opcode & 0x0F00) >> 8;
+  uint8_t Vy = (opcode & 0x00F0) >> 4;
+
+  if (registers[Vx] == registers[Vy]) {
+    pc += 2;
+  }
+}
+
+void Chip8::OP_6xkk() {
+  uint8_t Vx = (opcode & 0x0F00) >> 8;
+  registers[Vx] = opcode & 0x00FF;
+}
+
+void Chip8::OP_7xkk() {
+  uint8_t Vx = (opcode & 0x0F00) >> 8;
+  registers[Vx] += opcode & 0x00FF;
+}
+
+void Chip8::OP_8xy0() {
+  uint8_t Vx = (opcode & 0x0F00) >> 8;
+  uint8_t Vy = (opcode & 0x00F0) >> 4;
+  registers[Vx] = registers[Vy];
 }

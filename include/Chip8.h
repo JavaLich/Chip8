@@ -16,11 +16,19 @@ public:
   uint32_t video[32][64]{};
   uint16_t opcode;
 
-  void LoadROM(const char *filename);
+  void load_rom(const char *filename);
+  void step();
 
   Chip8();
 
   void OP_00E0();
   void OP_00EE();
   void OP_1nnn();
+  void OP_2nnn();
+  void OP_3xkk();
+  void OP_4xkk();
+  void OP_5xy0();
+  void OP_6xkk();
+  void OP_7xkk();
+  void OP_8xy0();
 };
