@@ -32,4 +32,7 @@ public:
   void OP_7xkk();
   void OP_8xy0();
   void OP_8xy1();
+  void OP_8xy2();
+  void OP_8xy3();
+  void OP_8xy4();
 };
