@@ -35,4 +35,5 @@ public:
   void OP_8xy2();
   void OP_8xy3();
   void OP_8xy4();
+  void OP_8xy5();
 };
