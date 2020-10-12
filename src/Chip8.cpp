@@ -68,27 +68,27 @@ void Chip8::OP_00EE() {
 }
 
 void Chip8::OP_1nnn() {
-  pc = opcode & 0x0FFFu;
+  pc = opcode & 0x0FFF;
 }
 
 void Chip8::OP_2nnn() {
   stack[sp] = pc;
-  pc = opcode & 0x0FFFu;
+  pc = opcode & 0x0FFF;
   sp++;
 }
 
 void Chip8::OP_3xkk() {
-  uint8_t kk = opcode & 0x00FFu;
+  uint8_t kk = opcode & 0x00FF;
 
-  if (registers[(opcode & 0x0F00u) >> 8] == kk) {
+  if (registers[(opcode & 0x0F00) >> 8] == kk) {
     pc += 2;
   }
 }
 
 void Chip8::OP_4xkk() {
-  uint8_t kk = opcode & 0x00FFu;
+  uint8_t kk = opcode & 0x00FF;
 
-  if (registers[(opcode & 0x0F00u) >> 8] != kk) {
+  if (registers[(opcode & 0x0F00) >> 8] != kk) {
     pc += 2;
   }
 }
@@ -167,4 +167,16 @@ void Chip8::OP_8xy5() {
   }
 
   registers[Vx] = difference;
+}
+
+void Chip8::OP_8xy6() {
+  uint8_t Vx = (opcode & 0x0F00) >> 8;
+
+  if ((Vx & 0x1) == 1) {
+    registers[0xF] = 1;
+  } else {
+    registers[0xF] = 0;
+  }
+
+  Vx /= 2;
 }
