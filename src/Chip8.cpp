@@ -195,3 +195,15 @@ void Chip8::OP_8xy7() {
 
   registers[Vx] = difference;
 }
+
+void Chip8::OP_8xyE() {
+  uint8_t Vx = (opcode & 0x0F00) >> 8;
+
+  if (registers[Vx] >> 7 == 0x1) {
+    registers[0xF] = 1;
+  } else {
+    registers[0xF] = 0;
+  }
+
+  registers[Vx] *= 2;
+}
