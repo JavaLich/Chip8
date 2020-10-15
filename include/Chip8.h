@@ -6,7 +6,7 @@ class Chip8 {
 public:
   uint8_t registers[16]{};
   uint8_t memory[4096]{};
-  uint16_t index{};
+  uint16_t i{};
   uint16_t pc{};
   uint16_t stack[16]{};
   uint8_t sp{};
@@ -40,4 +40,5 @@ public:
   void OP_8xy7();
   void OP_8xyE();
   void OP_9xy0();
+  void OP_Annn();
 };
