@@ -41,4 +41,5 @@ public:
   void OP_8xyE();
   void OP_9xy0();
   void OP_Annn();
+  void OP_Bnnn();
 };

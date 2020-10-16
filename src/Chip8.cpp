@@ -219,3 +219,8 @@ void Chip8::OP_Annn() {
   uint16_t nnn = opcode & 0x0FFF;
   i = nnn;
 }
+
+void Chip8::OP_Bnnn() {
+  uint16_t nnn = opcode & 0x0FFF;
+  pc = registers[0x0] + nnn;
+}
