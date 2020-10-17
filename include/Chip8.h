@@ -1,8 +1,15 @@
 #pragma once
 
+#include <random>
 #include <cstdint>
 
 class Chip8 {
+private:
+  std::mt19937 mt;
+  std::uniform_int_distribution<uint32_t> dist;
+
+  uint8_t generate_random_number();
+
 public:
   uint8_t registers[16]{};
   uint8_t memory[4096]{};

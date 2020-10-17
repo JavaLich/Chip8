@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstring>
 #include <fstream>
+#include <iostream>
 
 const uint16_t START_ADDRESS = 0x200;
 const uint16_t FONTSET_ADDERSS = 0x50;
@@ -33,9 +34,17 @@ uint8_t fontset[NUM_FONTS][FONT_SIZE] = {
 };
 
 Chip8::Chip8() {
+  std::random_device rd;
+  mt = std::mt19937(rd());
+  dist = std::uniform_int_distribution<uint32_t>(0, 255);
+
   pc = START_ADDRESS;
 
   std::copy(&fontset[0][0], &fontset[0][0] + NUM_FONTS * FONT_SIZE, &memory[FONTSET_ADDERSS]);
+}
+
+uint8_t Chip8::generate_random_number() {
+  return (uint8_t) dist(mt);
 }
 
 void Chip8::load_rom(const char *filename) {
