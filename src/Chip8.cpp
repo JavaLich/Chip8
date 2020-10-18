@@ -233,3 +233,11 @@ void Chip8::OP_Bnnn() {
   uint16_t nnn = opcode & 0x0FFF;
   pc = registers[0x0] + nnn;
 }
+
+void Chip8::OP_Cxkk() {
+  uint8_t kk = 0x00FF & opcode;
+  uint8_t Vx = (0x0F00 & opcode) >> 8;
+  uint8_t rand = generate_random_number() & kk;
+
+  registers[Vx] = rand;
+}

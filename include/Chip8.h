@@ -49,4 +49,5 @@ public:
   void OP_9xy0();
   void OP_Annn();
   void OP_Bnnn();
+  void OP_Cxkk();
 };
