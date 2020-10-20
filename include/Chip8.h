@@ -50,4 +50,5 @@ public:
   void OP_Annn();
   void OP_Bnnn();
   void OP_Cxkk();
+  void OP_Dxyn();
 };

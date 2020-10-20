@@ -1,6 +1,7 @@
 .clangd/
 Debug/
 Release/
+CMakeFiles/
 
 compile_commands.json
 build_commands.sh

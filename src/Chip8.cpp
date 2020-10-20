@@ -241,3 +241,31 @@ void Chip8::OP_Cxkk() {
 
   registers[Vx] = rand;
 }
+
+void Chip8::OP_Dxyn() {
+  uint8_t Vx = (opcode & 0x0F00) >> 8;
+  uint8_t Vy = (opcode & 0x00F0) >> 4;
+  uint8_t n = opcode & 0x000F;
+
+  uint8_t* sprite = &memory[i];
+
+  for (int r = 0; r < n; r++) {
+    if (Vx > VIDEO_WIDTH - 1 - 8) {
+      
+    } else if (Vx < 8 - 1) {
+
+    } else if (Vy > VIDEO_HEIGHT - 1 - 8) {
+      
+    } else if (Vy < 8 - 1) {
+
+    }
+
+    uint8_t byte = sprite[r];
+    for (int c = 0; c < 8; c++) {
+      uint8_t bit = byte & 0x01;
+      video[Vy][Vx] = (uint32_t) bit ^ video[Vy][Vx];
+      if (video[Vy][Vx] == 1 && bit == 1) registers[0xF] = 1;
+      byte >>= 1;
+    }
+  }
+}
