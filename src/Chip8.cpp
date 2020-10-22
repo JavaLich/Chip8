@@ -6,7 +6,7 @@
 #include <iostream>
 
 const uint16_t START_ADDRESS = 0x200;
-const uint16_t FONTSET_ADDERSS = 0x50;
+const uint16_t FONTSET_ADDRESS = 0x50;
 
 const uint8_t NUM_FONTS = 16;
 const uint8_t FONT_SIZE = 5;
@@ -41,7 +41,7 @@ Chip8::Chip8() {
   pc = START_ADDRESS;
 
   std::copy(&fontset[0][0], &fontset[0][0] + NUM_FONTS * FONT_SIZE,
-            &memory[FONTSET_ADDERSS]);
+            &memory[FONTSET_ADDRESS]);
 }
 
 uint8_t Chip8::generate_random_number() { return (uint8_t)dist(mt); }
@@ -257,12 +257,30 @@ void Chip8::OP_Dxyn() {
         x -= VIDEO_WIDTH;
       }
 
-      video[y][x] = (uint32_t) bit ^ video[Vy][Vx];
+      uint8_t pixel = video[y * 64 + x] == 0xFFFFFFFF ? 1 : 0;
 
-      if (video[y][x] == 1 && bit == 1)
+      video[y * 64 + x] = (bit ^ pixel) == 1 ? 0xFFFFFFFF : 0x00000000;
+
+      if (video[y * 64 + x] == 0xFFFFFFFF && bit == 1)
         registers[0xF] = 1;
 
       byte >>= 1;
     }
   }
+}
+
+void Chip8::OP_Ex9E() {
+    uint8_t Vx = 0x0F00 >> 8;
+
+    if (keypad[Vx]) {
+        pc += 2;
+    }
+}
+
+void Chip8::OP_ExA1() {
+    uint8_t Vx = 0x0F00 >> 8;
+
+    if (!keypad[Vx]) {
+        pc += 2;
+    }
 }

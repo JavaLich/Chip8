@@ -19,8 +19,8 @@ public:
   uint8_t sp{};
   uint8_t delayTimer{};
   uint8_t soundTimer{};
-  uint8_t keypad[16]{};
-  uint32_t video[32][64]{};
+  bool keypad[16]{};
+  uint32_t video[64 * 32]{};
   uint16_t opcode;
 
   void load_rom(const char *filename);
@@ -51,4 +51,6 @@ public:
   void OP_Bnnn();
   void OP_Cxkk();
   void OP_Dxyn();
+  void OP_Ex9E();
+  void OP_ExA1();
 };
