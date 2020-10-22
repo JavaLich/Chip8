@@ -15,7 +15,7 @@ int main() {
   Chip8 chip;
   chip.load_rom("file");
   chip.i = 0x50;
-  chip.opcode = 0xD005;
+  chip.opcode = 0xDF05;
   chip.OP_Dxyn();
 
   using std::cerr;
@@ -27,7 +27,7 @@ int main() {
   }
 
   SDL_Window *win =
-      SDL_CreateWindow("Chip8 Emulator", 100, 100, 640, 320, SDL_WINDOW_SHOWN);
+      SDL_CreateWindow("Chip8 Emulator", 0, 0, 640, 320, SDL_WINDOW_SHOWN);
   if (win == nullptr) {
     cerr << "SDL_CreateWindow Error: " << SDL_GetError() << endl;
     return EXIT_FAILURE;
