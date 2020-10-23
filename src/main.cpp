@@ -1,22 +1,11 @@
 #include <SDL2/SDL.h>
-#include <SDL_events.h>
-#include <SDL_pixels.h>
-#include <SDL_render.h>
-#include <bits/stdint-uintn.h>
-#include <cstdlib>
 #include <iostream>
-#include <random>
-#include <sys/types.h>
 
 #include "Chip8.h"
 
 int main() {
-
   Chip8 chip;
   chip.load_rom("file");
-  chip.i = 0x50;
-  chip.opcode = 0xDF05;
-  chip.OP_Dxyn();
 
   using std::cerr;
   using std::endl;
@@ -44,12 +33,13 @@ int main() {
     return EXIT_FAILURE;
   }
 
-  SDL_Texture* buffer = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, 64, 32);
+  SDL_Texture *buffer = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGBA8888,
+                                          SDL_TEXTUREACCESS_STREAMING, 64, 32);
 
   while (true) {
-	SDL_UpdateTexture(buffer, NULL, &chip.video, 64 * sizeof(uint32_t));
+    SDL_UpdateTexture(buffer, NULL, &chip.video, 64 * sizeof(uint32_t));
     SDL_RenderClear(ren);
-	SDL_RenderCopy(ren, buffer, NULL, NULL);
+    SDL_RenderCopy(ren, buffer, NULL, NULL);
     SDL_RenderPresent(ren);
     SDL_Event event;
     if (SDL_PollEvent(&event)) {

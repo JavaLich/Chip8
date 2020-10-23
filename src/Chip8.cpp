@@ -245,7 +245,7 @@ void Chip8::OP_Dxyn() {
 
   for (int r = 0; r < n; r++) {
     uint8_t byte = sprite[r];
-    for (int c = 0; c < 8; c++) {
+    for (int c = 8 - 1; c > -1; c--) {
       uint8_t bit = byte & 0x1;
       int x = Vx + c;
       int y = Vy + r;
@@ -255,6 +255,12 @@ void Chip8::OP_Dxyn() {
       }
       if (x >= VIDEO_WIDTH) {
         x -= VIDEO_WIDTH;
+      }
+      if (x < 0) {
+          x += VIDEO_WIDTH;
+      }
+      if (y < 0) {
+          y += VIDEO_HEIGHT;
       }
 
       uint8_t pixel = video[y * 64 + x] == 0xFFFFFFFF ? 1 : 0;
