@@ -11,6 +11,8 @@ const uint16_t FONTSET_ADDRESS = 0x50;
 const uint8_t NUM_FONTS = 16;
 const uint8_t FONT_SIZE = 5;
 
+const uint8_t NUM_KEYS = 16;
+
 const uint8_t VIDEO_WIDTH = 64;
 const uint8_t VIDEO_HEIGHT = 32;
 
@@ -62,7 +64,10 @@ void Chip8::load_rom(const char *filename) {
   delete[] buffer;
 }
 
-void Chip8::step() { pc += 2; }
+void Chip8::step() { 
+    // TODO: Execute OP code at current pc
+    pc += 2; 
+}
 
 void Chip8::OP_00E0() { std::memset(video, 0, sizeof(video)); }
 
@@ -289,4 +294,25 @@ void Chip8::OP_ExA1() {
     if (!keypad[Vx]) {
         pc += 2;
     }
+}
+
+void Chip8::OP_Fx07() {
+    uint8_t Vx = 0x0F00 >> 8;
+
+    registers[Vx] = delayTimer;
+}
+
+void Chip8::OP_Fx0A() {
+    uint8_t Vx = 0x0F00 >> 8;
+
+    bool keyPressed = false;
+    for (uint8_t key = 0; key < NUM_KEYS; key++) {
+        if (keypad[key]) {
+            keyPressed = true;
+            registers[Vx] = key;
+            break;
+        }
+    }
+
+    if (!keyPressed) pc -= 2;
 }

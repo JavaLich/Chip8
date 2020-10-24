@@ -53,4 +53,6 @@ public:
   void OP_Dxyn();
   void OP_Ex9E();
   void OP_ExA1();
+  void OP_Fx07();
+  void OP_Fx0A();
 };
