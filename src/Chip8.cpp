@@ -13,6 +13,8 @@ const uint8_t FONT_SIZE = 5;
 
 const uint8_t NUM_KEYS = 16;
 
+const uint8_t NUM_REGISTERS = 16;
+
 const uint8_t VIDEO_WIDTH = 64;
 const uint8_t VIDEO_HEIGHT = 32;
 
@@ -42,8 +44,7 @@ Chip8::Chip8() {
 
   pc = START_ADDRESS;
 
-  std::copy(&fontset[0][0], &fontset[0][0] + NUM_FONTS * FONT_SIZE,
-            &memory[FONTSET_ADDRESS]);
+  std::copy(&fontset[0][0], &fontset[0][0] + NUM_FONTS * FONT_SIZE, &memory[FONTSET_ADDRESS]);
 }
 
 uint8_t Chip8::generate_random_number() { return (uint8_t)dist(mt); }
@@ -225,7 +226,7 @@ void Chip8::OP_9xy0() {
 
 void Chip8::OP_Annn() {
   uint16_t nnn = opcode & 0x0FFF;
-  i = nnn;
+  memory[i] = nnn;
 }
 
 void Chip8::OP_Bnnn() {
@@ -315,4 +316,45 @@ void Chip8::OP_Fx0A() {
     }
 
     if (!keyPressed) pc -= 2;
+}
+
+void Chip8::OP_Fx15() {
+    uint8_t Vx = 0x0F00 >> 8;
+    delayTimer = registers[Vx];
+}
+
+void Chip8::OP_Fx18() {
+    uint8_t Vx = 0x0F00 >> 8;
+    soundTimer = registers[Vx];
+}
+
+void Chip8::OP_Fx1E() {
+    uint8_t Vx = 0x0F00 >> 8;
+    memory[i]  += registers[Vx];
+}
+
+void Chip8::OP_Fx29() {
+    uint8_t Vx = 0x0F00 >> 8;
+    memory[i] = FONTSET_ADDRESS + registers[Vx];
+}
+
+void Chip8::OP_Fx33() {
+    uint8_t Vx = 0x0F00 >> 8;
+    
+    uint8_t value = registers[Vx];
+    memory[i] = value / 100;
+    value -= memory[i] * 100;
+    memory[i + 1] = value / 10;
+    value -= memory[i + 1] * 10;
+    memory[i + 2] = value;
+}
+
+void Chip8::OP_Fx55() {
+    uint8_t Vx = 0x0F00 >> 8;
+    std::copy(&registers[0], &registers[0] + registers[Vx], &memory[i]);
+}
+
+void Chip8::OP_Fx65() {
+    uint8_t Vx = 0x0F00 >> 8;
+    std::copy(&memory[i], &memory[i] + registers[Vx], &registers[0]);
 }
