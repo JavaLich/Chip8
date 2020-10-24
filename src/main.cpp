@@ -5,7 +5,7 @@
 
 int main() {
   Chip8 chip;
-  chip.load_rom("file");
+  chip.load_rom("morse_demo.ch8");
 
   using std::cerr;
   using std::endl;
@@ -37,6 +37,7 @@ int main() {
                                           SDL_TEXTUREACCESS_STREAMING, 64, 32);
 
   while (true) {
+    chip.step();
     SDL_UpdateTexture(buffer, NULL, &chip.video, 64 * sizeof(uint32_t));
     SDL_RenderClear(ren);
     SDL_RenderCopy(ren, buffer, NULL, NULL);

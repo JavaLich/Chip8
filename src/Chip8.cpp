@@ -1,6 +1,7 @@
 #include "Chip8.h"
 
 #include <algorithm>
+#include <bits/stdint-uintn.h>
 #include <cstring>
 #include <fstream>
 #include <iostream>
@@ -66,7 +67,45 @@ void Chip8::load_rom(const char *filename) {
 }
 
 void Chip8::step() { 
-    // TODO: Execute OP code at current pc
+    opcode = memory[pc];
+    opcode <<= 8;
+    opcode |= memory[pc + 1];
+    std::cout << std::hex << opcode << std::endl;
+    if (opcode == 0x00E0) OP_00E0();
+    else if (opcode == 0x00EE) OP_00EE();
+    else if (opcode >> 12 == 0x1) OP_1nnn();
+    else if (opcode >> 12 == 0x2) OP_2nnn();
+    else if (opcode >> 12 == 0x3) OP_3xkk();
+    else if (opcode >> 12 == 0x4) OP_4xkk();
+    else if (opcode >> 12 == 0x5) OP_5xy0();
+    else if (opcode >> 12 == 0x6) OP_6xkk();
+    else if (opcode >> 12 == 0x7) OP_7xkk();
+    else if (opcode >> 12 == 0x8 && (opcode & 0x000F) == 0x0) OP_8xy0();
+    else if (opcode >> 12 == 0x8 && (opcode & 0x000F) == 0x1) OP_8xy1();
+    else if (opcode >> 12 == 0x8 && (opcode & 0x000F) == 0x2) OP_8xy2();
+    else if (opcode >> 12 == 0x8 && (opcode & 0x000F) == 0x3) OP_8xy3();
+    else if (opcode >> 12 == 0x8 && (opcode & 0x000F) == 0x4) OP_8xy4();
+    else if (opcode >> 12 == 0x8 && (opcode & 0x000F) == 0x5) OP_8xy5();
+    else if (opcode >> 12 == 0x8 && (opcode & 0x000F) == 0x6) OP_8xy6();
+    else if (opcode >> 12 == 0x8 && (opcode & 0x000F) == 0x7) OP_8xy7();
+    else if (opcode >> 12 == 0x8 && (opcode & 0x000F) == 0xE) OP_8xyE();
+    else if (opcode >> 12 == 0x9) OP_9xy0();
+    else if (opcode >> 12 == 0xA) OP_Annn();
+    else if (opcode >> 12 == 0xB) OP_Bnnn();
+    else if (opcode >> 12 == 0xC) OP_Cxkk();
+    else if (opcode >> 12 == 0xD) OP_Dxyn();
+    else if (opcode >> 12 == 0xE && (opcode & 0x000F) == 0xE) OP_Ex9E();
+    else if (opcode >> 12 == 0xE && (opcode & 0x000F) == 0x1) OP_ExA1();
+    else if (opcode >> 12 == 0xF && (opcode & 0x000F) == 0x7) OP_Fx07();
+    else if (opcode >> 12 == 0xF && (opcode & 0x000F) == 0xA) OP_Fx0A();
+    else if (opcode >> 12 == 0xF && (opcode & 0x00F0) >> 4 == 0x1 && (opcode & 0x000F) == 0x5) OP_Fx15();
+    else if (opcode >> 12 == 0xF && (opcode & 0x00F0) >> 4 == 0x1 && (opcode & 0x000F) == 0x8) OP_Fx18();
+    else if (opcode >> 12 == 0xF && (opcode & 0x00F0) >> 4 == 0x1 && (opcode & 0x000F) == 0xE) OP_Fx1E();
+    else if (opcode >> 12 == 0xF && (opcode & 0x00F0) >> 4 == 0x2 && (opcode & 0x000F) == 0x9) OP_Fx29();
+    else if (opcode >> 12 == 0xF && (opcode & 0x00F0) >> 4 == 0x3 && (opcode & 0x000F) == 0x3) OP_Fx33();
+    else if (opcode >> 12 == 0xF && (opcode & 0x00F0) >> 4 == 0x5 && (opcode & 0x000F) == 0x5) OP_Fx55();
+    else if (opcode >> 12 == 0xF && (opcode & 0x00F0) >> 4 == 0x6 && (opcode & 0x000F) == 0x5) OP_Fx65();
+    else std::cout << "Error: unknown opcode" << std::endl;
     pc += 2; 
 }
 
