@@ -67,9 +67,7 @@ void Chip8::load_rom(const char *filename) {
 }
 
 void Chip8::step() { 
-    opcode = memory[pc];
-    opcode <<= 8;
-    opcode |= memory[pc + 1];
+    opcode = (memory[pc] << 8) | memory[pc + 1];
     std::cout << std::hex << opcode << std::endl;
     if (opcode == 0x00E0) OP_00E0();
     else if (opcode == 0x00EE) OP_00EE();
@@ -265,7 +263,7 @@ void Chip8::OP_9xy0() {
 
 void Chip8::OP_Annn() {
   uint16_t nnn = opcode & 0x0FFF;
-  memory[i] = nnn;
+  i = nnn;
 }
 
 void Chip8::OP_Bnnn() {
@@ -292,8 +290,8 @@ void Chip8::OP_Dxyn() {
     uint8_t byte = sprite[r];
     for (int c = 8 - 1; c > -1; c--) {
       uint8_t bit = byte & 0x1;
-      int x = Vx + c;
-      int y = Vy + r;
+      int x = registers[Vx] + c;
+      int y = registers[Vy] + r;
 
       if (y >= VIDEO_HEIGHT) {
         y -= VIDEO_HEIGHT;
@@ -369,12 +367,12 @@ void Chip8::OP_Fx18() {
 
 void Chip8::OP_Fx1E() {
     uint8_t Vx = 0x0F00 >> 8;
-    memory[i]  += registers[Vx];
+    i  += registers[Vx];
 }
 
 void Chip8::OP_Fx29() {
     uint8_t Vx = 0x0F00 >> 8;
-    memory[i] = FONTSET_ADDRESS + registers[Vx];
+    i = FONTSET_ADDRESS + registers[Vx];
 }
 
 void Chip8::OP_Fx33() {

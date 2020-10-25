@@ -1,11 +1,12 @@
 #include <SDL2/SDL.h>
+#include <SDL_events.h>
 #include <iostream>
 
 #include "Chip8.h"
 
 int main() {
   Chip8 chip;
-  chip.load_rom("morse_demo.ch8");
+  chip.load_rom("IBM Logo.ch8");
 
   using std::cerr;
   using std::endl;
@@ -36,16 +37,22 @@ int main() {
   SDL_Texture *buffer = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGBA8888,
                                           SDL_TEXTUREACCESS_STREAMING, 64, 32);
 
+  bool shouldStep = false;
   while (true) {
-    chip.step();
-    SDL_UpdateTexture(buffer, NULL, &chip.video, 64 * sizeof(uint32_t));
-    SDL_RenderClear(ren);
-    SDL_RenderCopy(ren, buffer, NULL, NULL);
-    SDL_RenderPresent(ren);
+    if (shouldStep) {
+      chip.step();
+      SDL_UpdateTexture(buffer, NULL, &chip.video, 64 * sizeof(uint32_t));
+      SDL_RenderClear(ren);
+      SDL_RenderCopy(ren, buffer, NULL, NULL);
+      SDL_RenderPresent(ren);
+      shouldStep = false;
+    }
     SDL_Event event;
     if (SDL_PollEvent(&event)) {
       if (event.type == SDL_QUIT) {
         break;
+      } else if (event.type == SDL_KEYDOWN) {
+        shouldStep = true;
       }
     }
   }
