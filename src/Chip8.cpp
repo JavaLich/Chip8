@@ -110,30 +110,35 @@ void Chip8::step() {
 void Chip8::OP_00E0() { std::memset(video, 0, sizeof(video)); }
 
 void Chip8::OP_00EE() {
-  sp--;
-  pc = sp;
+  pc = stack[--sp];
 }
 
-void Chip8::OP_1nnn() { pc = opcode & 0x0FFF; }
+void Chip8::OP_1nnn() { 
+    pc = opcode & 0x0FFF; 
+    pc -= 2;
+}
 
 void Chip8::OP_2nnn() {
-  stack[sp] = pc;
+  stack[sp++] = pc;
   pc = opcode & 0x0FFF;
-  sp++;
 }
 
 void Chip8::OP_3xkk() {
   uint8_t kk = opcode & 0x00FF;
+  uint8_t Vx = (opcode & 0x0F00) >> 8;
 
-  if (registers[(opcode & 0x0F00) >> 8] == kk) {
+
+  if (registers[Vx] == kk) {
     pc += 2;
   }
 }
 
 void Chip8::OP_4xkk() {
   uint8_t kk = opcode & 0x00FF;
+  uint8_t Vx = (opcode & 0x0F00) >> 8;
 
-  if (registers[(opcode & 0x0F00) >> 8] != kk) {
+
+  if (registers[Vx] != kk) {
     pc += 2;
   }
 }
@@ -153,8 +158,9 @@ void Chip8::OP_6xkk() {
 }
 
 void Chip8::OP_7xkk() {
+  uint8_t kk = opcode & 0x00FF;
   uint8_t Vx = (opcode & 0x0F00) >> 8;
-  registers[Vx] += opcode & 0x00FF;
+  registers[Vx] += kk;
 }
 
 void Chip8::OP_8xy0() {

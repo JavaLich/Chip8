@@ -6,7 +6,7 @@
 
 int main() {
   Chip8 chip;
-  chip.load_rom("IBM Logo.ch8");
+  chip.load_rom("test_opcode.ch8");
 
   using std::cerr;
   using std::endl;
