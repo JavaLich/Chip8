@@ -223,13 +223,13 @@ void Chip8::OP_8xy5() {
 void Chip8::OP_8xy6() {
   uint8_t Vx = (opcode & 0x0F00) >> 8;
 
-  if ((Vx & 0x1) == 1) {
+  if ((registers[Vx] & 0x1) == 1) {
     registers[0xF] = 1;
   } else {
     registers[0xF] = 0;
   }
 
-  Vx /= 2;
+  registers[Vx] /= 2;
 }
 
 void Chip8::OP_8xy7() {
@@ -250,7 +250,7 @@ void Chip8::OP_8xy7() {
 void Chip8::OP_8xyE() {
   uint8_t Vx = (opcode & 0x0F00) >> 8;
 
-  if (registers[Vx] >> 7 == 0x1) {
+  if ((registers[Vx] & 0x80) >> 7 == 1) {
     registers[0xF] = 1;
   } else {
     registers[0xF] = 0;
@@ -383,21 +383,23 @@ void Chip8::OP_Fx29() {
 
 void Chip8::OP_Fx33() {
     uint8_t Vx = 0x0F00 >> 8;
-    
     uint8_t value = registers[Vx];
-    memory[i] = value / 100;
-    value -= memory[i] * 100;
-    memory[i + 1] = value / 10;
-    value -= memory[i + 1] * 10;
-    memory[i + 2] = value;
+    std::cout << (uint32_t) value << std::endl;
+    memory[i + 2] = value % 10;
+    value /= 10;
+    std::cout << (uint32_t) value << std::endl;
+    memory[i + 1] = value % 10;
+    value /= 10;
+    std::cout << (uint32_t) value << std::endl;
+    memory[i] = value % 10;
 }
 
 void Chip8::OP_Fx55() {
     uint8_t Vx = 0x0F00 >> 8;
-    std::copy(&registers[0], &registers[0] + registers[Vx], &memory[i]);
+    std::copy(&registers[0], &registers[Vx + 1], &memory[i]);
 }
 
 void Chip8::OP_Fx65() {
     uint8_t Vx = 0x0F00 >> 8;
-    std::copy(&memory[i], &memory[i] + registers[Vx], &registers[0]);
+    std::copy(&memory[i], &memory[i + Vx + 1], &registers[0]);
 }
