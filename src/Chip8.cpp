@@ -6,10 +6,7 @@
 #include <fstream>
 #include <iostream>
 
-const uint16_t START_ADDRESS = 0x200;
-const uint16_t FONTSET_ADDRESS = 0x50;
-
-const uint8_t NUM_FONTS = 16;
+const uint16_t START_ADDRESS = 0x200; const uint16_t FONTSET_ADDRESS = 0x50; const uint8_t NUM_FONTS = 16;
 const uint8_t FONT_SIZE = 5;
 
 const uint8_t NUM_KEYS = 16;
@@ -69,6 +66,7 @@ void Chip8::load_rom(const char *filename) {
 void Chip8::step() { 
     opcode = (memory[pc] << 8) | memory[pc + 1];
     std::cout << std::hex << opcode << std::endl;
+    pc += 2; 
     if (opcode == 0x00E0) OP_00E0();
     else if (opcode == 0x00EE) OP_00EE();
     else if (opcode >> 12 == 0x1) OP_1nnn();
@@ -92,30 +90,29 @@ void Chip8::step() {
     else if (opcode >> 12 == 0xB) OP_Bnnn();
     else if (opcode >> 12 == 0xC) OP_Cxkk();
     else if (opcode >> 12 == 0xD) OP_Dxyn();
-    else if (opcode >> 12 == 0xE && (opcode & 0x000F) == 0xE) OP_Ex9E();
-    else if (opcode >> 12 == 0xE && (opcode & 0x000F) == 0x1) OP_ExA1();
-    else if (opcode >> 12 == 0xF && (opcode & 0x000F) == 0x7) OP_Fx07();
-    else if (opcode >> 12 == 0xF && (opcode & 0x000F) == 0xA) OP_Fx0A();
-    else if (opcode >> 12 == 0xF && (opcode & 0x00F0) >> 4 == 0x1 && (opcode & 0x000F) == 0x5) OP_Fx15();
-    else if (opcode >> 12 == 0xF && (opcode & 0x00F0) >> 4 == 0x1 && (opcode & 0x000F) == 0x8) OP_Fx18();
-    else if (opcode >> 12 == 0xF && (opcode & 0x00F0) >> 4 == 0x1 && (opcode & 0x000F) == 0xE) OP_Fx1E();
-    else if (opcode >> 12 == 0xF && (opcode & 0x00F0) >> 4 == 0x2 && (opcode & 0x000F) == 0x9) OP_Fx29();
-    else if (opcode >> 12 == 0xF && (opcode & 0x00F0) >> 4 == 0x3 && (opcode & 0x000F) == 0x3) OP_Fx33();
-    else if (opcode >> 12 == 0xF && (opcode & 0x00F0) >> 4 == 0x5 && (opcode & 0x000F) == 0x5) OP_Fx55();
-    else if (opcode >> 12 == 0xF && (opcode & 0x00F0) >> 4 == 0x6 && (opcode & 0x000F) == 0x5) OP_Fx65();
+    else if (opcode >> 12 == 0xE && (opcode & 0x00FF) == 0x9E) OP_Ex9E();
+    else if (opcode >> 12 == 0xE && (opcode & 0x00FF) == 0xA1) OP_ExA1();
+    else if (opcode >> 12 == 0xF && (opcode & 0x00FF) == 0x07) OP_Fx07();
+    else if (opcode >> 12 == 0xF && (opcode & 0x00FF) == 0x0A) OP_Fx0A();
+    else if (opcode >> 12 == 0xF && (opcode & 0x00FF) == 0x15) OP_Fx15();
+    else if (opcode >> 12 == 0xF && (opcode & 0x00FF) == 0x18) OP_Fx18();
+    else if (opcode >> 12 == 0xF && (opcode & 0x00FF) == 0x1E) OP_Fx1E();
+    else if (opcode >> 12 == 0xF && (opcode & 0x00FF) == 0x29) OP_Fx29();
+    else if (opcode >> 12 == 0xF && (opcode & 0x00FF) == 0x33) OP_Fx33();
+    else if (opcode >> 12 == 0xF && (opcode & 0x00FF) == 0x55) OP_Fx55();
+    else if (opcode >> 12 == 0xF && (opcode & 0x00FF) == 0x65) OP_Fx65();
     else std::cout << "Error: unknown opcode" << std::endl;
-    pc += 2; 
 }
 
 void Chip8::OP_00E0() { std::memset(video, 0, sizeof(video)); }
 
 void Chip8::OP_00EE() {
-  pc = stack[--sp];
+	pc = stack[--sp];
 }
 
 void Chip8::OP_1nnn() { 
-    pc = opcode & 0x0FFF; 
-    pc -= 2;
+	stack[sp++] = pc;
+	pc = opcode & 0x0FFF;
 }
 
 void Chip8::OP_2nnn() {
@@ -127,7 +124,6 @@ void Chip8::OP_3xkk() {
   uint8_t kk = opcode & 0x00FF;
   uint8_t Vx = (opcode & 0x0F00) >> 8;
 
-
   if (registers[Vx] == kk) {
     pc += 2;
   }
@@ -136,7 +132,6 @@ void Chip8::OP_3xkk() {
 void Chip8::OP_4xkk() {
   uint8_t kk = opcode & 0x00FF;
   uint8_t Vx = (opcode & 0x0F00) >> 8;
-
 
   if (registers[Vx] != kk) {
     pc += 2;
@@ -291,7 +286,7 @@ void Chip8::OP_Dxyn() {
   uint8_t n = opcode & 0x000F;
 
   uint8_t *sprite = &memory[i];
-
+  bool collided = false;
   for (int r = 0; r < n; r++) {
     uint8_t byte = sprite[r];
     for (int c = 8 - 1; c > -1; c--) {
@@ -317,11 +312,15 @@ void Chip8::OP_Dxyn() {
       video[y * 64 + x] = (bit ^ pixel) == 1 ? 0xFFFFFFFF : 0x00000000;
 
       if (video[y * 64 + x] == 0xFFFFFFFF && bit == 1)
-        registers[0xF] = 1;
-
+        collided = true;
       byte >>= 1;
     }
   }
+
+  if (collided) 
+      registers[0xF] = 1;
+  else
+      registers[0xF] = 0;
 }
 
 void Chip8::OP_Ex9E() {
@@ -384,13 +383,10 @@ void Chip8::OP_Fx29() {
 void Chip8::OP_Fx33() {
     uint8_t Vx = 0x0F00 >> 8;
     uint8_t value = registers[Vx];
-    std::cout << (uint32_t) value << std::endl;
     memory[i + 2] = value % 10;
     value /= 10;
-    std::cout << (uint32_t) value << std::endl;
     memory[i + 1] = value % 10;
     value /= 10;
-    std::cout << (uint32_t) value << std::endl;
     memory[i] = value % 10;
 }
 
@@ -401,5 +397,5 @@ void Chip8::OP_Fx55() {
 
 void Chip8::OP_Fx65() {
     uint8_t Vx = 0x0F00 >> 8;
-    std::copy(&memory[i], &memory[i + Vx + 1], &registers[0]);
+    std::copy(&memory[i], &memory[i + Vx + 1], &registers[0]); 
 }
