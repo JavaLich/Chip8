@@ -6,7 +6,7 @@
 
 int main() {
   Chip8 chip;
-  chip.load_rom("test_opcode.ch8");
+  chip.load_rom("BC_test.ch8");
 
   using std::cerr;
   using std::endl;
@@ -45,7 +45,7 @@ int main() {
       SDL_RenderClear(ren);
       SDL_RenderCopy(ren, buffer, NULL, NULL);
       SDL_RenderPresent(ren);
-      shouldStep = false;
+      //shouldStep = false;
     }
     SDL_Event event;
     if (SDL_PollEvent(&event)) {

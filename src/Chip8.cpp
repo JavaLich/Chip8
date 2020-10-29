@@ -6,7 +6,9 @@
 #include <fstream>
 #include <iostream>
 
-const uint16_t START_ADDRESS = 0x200; const uint16_t FONTSET_ADDRESS = 0x50; const uint8_t NUM_FONTS = 16;
+const uint16_t START_ADDRESS = 0x200; 
+const uint16_t FONTSET_ADDRESS = 0x50; 
+const uint8_t NUM_FONTS = 16;
 const uint8_t FONT_SIZE = 5;
 
 const uint8_t NUM_KEYS = 16;
@@ -65,7 +67,7 @@ void Chip8::load_rom(const char *filename) {
 
 void Chip8::step() { 
     opcode = (memory[pc] << 8) | memory[pc + 1];
-    std::cout << std::hex << opcode << std::endl;
+    //std::cout << std::hex << opcode << std::endl;
     pc += 2; 
     if (opcode == 0x00E0) OP_00E0();
     else if (opcode == 0x00EE) OP_00EE();
@@ -104,7 +106,9 @@ void Chip8::step() {
     else std::cout << "Error: unknown opcode" << std::endl;
 }
 
-void Chip8::OP_00E0() { std::memset(video, 0, sizeof(video)); }
+void Chip8::OP_00E0() { 
+    std::memset(video, 0, sizeof(video)); 
+}
 
 void Chip8::OP_00EE() {
 	pc = stack[--sp];
@@ -324,7 +328,7 @@ void Chip8::OP_Dxyn() {
 }
 
 void Chip8::OP_Ex9E() {
-    uint8_t Vx = 0x0F00 >> 8;
+    uint8_t Vx = (opcode & 0x0F00) >> 8;
 
     if (keypad[Vx]) {
         pc += 2;
@@ -332,7 +336,7 @@ void Chip8::OP_Ex9E() {
 }
 
 void Chip8::OP_ExA1() {
-    uint8_t Vx = 0x0F00 >> 8;
+    uint8_t Vx = (opcode & 0x0F00) >> 8;
 
     if (!keypad[Vx]) {
         pc += 2;
@@ -340,13 +344,13 @@ void Chip8::OP_ExA1() {
 }
 
 void Chip8::OP_Fx07() {
-    uint8_t Vx = 0x0F00 >> 8;
+    uint8_t Vx = (opcode & 0x0F00) >> 8;
 
     registers[Vx] = delayTimer;
 }
 
 void Chip8::OP_Fx0A() {
-    uint8_t Vx = 0x0F00 >> 8;
+    uint8_t Vx = (opcode & 0x0F00) >> 8;
 
     bool keyPressed = false;
     for (uint8_t key = 0; key < NUM_KEYS; key++) {
@@ -361,27 +365,27 @@ void Chip8::OP_Fx0A() {
 }
 
 void Chip8::OP_Fx15() {
-    uint8_t Vx = 0x0F00 >> 8;
+    uint8_t Vx = (opcode & 0x0F00) >> 8;
     delayTimer = registers[Vx];
 }
 
 void Chip8::OP_Fx18() {
-    uint8_t Vx = 0x0F00 >> 8;
+    uint8_t Vx = (opcode & 0x0F00) >> 8;
     soundTimer = registers[Vx];
 }
 
 void Chip8::OP_Fx1E() {
-    uint8_t Vx = 0x0F00 >> 8;
-    i  += registers[Vx];
+    uint8_t Vx = (opcode & 0x0F00) >> 8;
+    i += registers[Vx];
 }
 
 void Chip8::OP_Fx29() {
-    uint8_t Vx = 0x0F00 >> 8;
+    uint8_t Vx = (opcode & 0x0F00) >> 8;
     i = FONTSET_ADDRESS + registers[Vx];
 }
 
 void Chip8::OP_Fx33() {
-    uint8_t Vx = 0x0F00 >> 8;
+    uint8_t Vx = (opcode & 0x0F00) >> 8;
     uint8_t value = registers[Vx];
     memory[i + 2] = value % 10;
     value /= 10;
@@ -391,11 +395,11 @@ void Chip8::OP_Fx33() {
 }
 
 void Chip8::OP_Fx55() {
-    uint8_t Vx = 0x0F00 >> 8;
+    uint8_t Vx = (opcode & 0x0F00) >> 8;
     std::copy(&registers[0], &registers[Vx + 1], &memory[i]);
 }
 
 void Chip8::OP_Fx65() {
-    uint8_t Vx = 0x0F00 >> 8;
+    uint8_t Vx = (opcode & 0x0F00) >> 8;
     std::copy(&memory[i], &memory[i + Vx + 1], &registers[0]); 
 }
