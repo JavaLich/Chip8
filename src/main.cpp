@@ -6,7 +6,7 @@
 
 int main() {
   Chip8 chip;
-  chip.load_rom("BC_test.ch8");
+  chip.load_rom("PONG");
 
   using std::cerr;
   using std::endl;

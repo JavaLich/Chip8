@@ -68,7 +68,16 @@ void Chip8::load_rom(const char *filename) {
 void Chip8::step() { 
     opcode = (memory[pc] << 8) | memory[pc + 1];
     //std::cout << std::hex << opcode << std::endl;
+    for (int y = 0; y < VIDEO_HEIGHT; y++) {
+        for (int x = 0; x < VIDEO_HEIGHT; x++) {
+            if (video[x + y * VIDEO_HEIGHT] != 0x0 || video[x + y * VIDEO_HEIGHT] != 0xFFFFFFFF) {
+                std::cout << x << ", " << y << std::endl;
+            }
+        }       
+    }
     pc += 2; 
+    if (delayTimer > 0) 
+        delayTimer--;
     if (opcode == 0x00E0) OP_00E0();
     else if (opcode == 0x00EE) OP_00EE();
     else if (opcode >> 12 == 0x1) OP_1nnn();
@@ -103,7 +112,10 @@ void Chip8::step() {
     else if (opcode >> 12 == 0xF && (opcode & 0x00FF) == 0x33) OP_Fx33();
     else if (opcode >> 12 == 0xF && (opcode & 0x00FF) == 0x55) OP_Fx55();
     else if (opcode >> 12 == 0xF && (opcode & 0x00FF) == 0x65) OP_Fx65();
-    else std::cout << "Error: unknown opcode" << std::endl;
+    else {
+        std::cout << std::hex << opcode << std::endl;
+        std::cout << "Error: unknown opcode" << std::endl;
+    }
 }
 
 void Chip8::OP_00E0() { 
