@@ -1,12 +1,13 @@
 #pragma once
 
+#include <bits/stdint-uintn.h>
 #include <random>
 #include <cstdint>
 
 class Chip8 {
 private:
   std::mt19937 mt;
-  std::uniform_int_distribution<uint32_t> dist;
+  std::uniform_int_distribution<uint8_t> dist;
 
   uint8_t generate_random_number();
 

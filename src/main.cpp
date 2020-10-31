@@ -1,12 +1,14 @@
 #include <SDL2/SDL.h>
+#include <SDL_error.h>
 #include <SDL_events.h>
+#include <SDL_render.h>
 #include <iostream>
 
 #include "Chip8.h"
 
 int main() {
   Chip8 chip;
-  chip.load_rom("PONG");
+  chip.load_rom("LunarLander.ch8");
 
   using std::cerr;
   using std::endl;
@@ -16,15 +18,13 @@ int main() {
     return EXIT_FAILURE;
   }
 
-  SDL_Window *win =
-      SDL_CreateWindow("Chip8 Emulator", 0, 0, 640, 320, SDL_WINDOW_SHOWN);
+  SDL_Window *win = SDL_CreateWindow("Chip8 Emulator", 0, 0, 640, 320, SDL_WINDOW_SHOWN);
   if (win == nullptr) {
     cerr << "SDL_CreateWindow Error: " << SDL_GetError() << endl;
     return EXIT_FAILURE;
   }
 
-  SDL_Renderer *ren = SDL_CreateRenderer(
-      win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  SDL_Renderer *ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
   if (ren == nullptr) {
     cerr << "SDL_CreateRenderer Error" << SDL_GetError() << endl;
     if (win != nullptr) {
@@ -34,14 +34,15 @@ int main() {
     return EXIT_FAILURE;
   }
 
-  SDL_Texture *buffer = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGBA8888,
-                                          SDL_TEXTUREACCESS_STREAMING, 64, 32);
+  SDL_Texture *buffer = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, 64, 32);
 
   bool shouldStep = false;
   while (true) {
     if (shouldStep) {
       chip.step();
-      SDL_UpdateTexture(buffer, NULL, &chip.video, 64 * sizeof(uint32_t));
+      if (SDL_UpdateTexture(buffer, NULL, &chip.video, 64 * sizeof(uint32_t)) < 0) {
+        std::cout << SDL_GetError() << std::endl;
+      }
       SDL_RenderClear(ren);
       SDL_RenderCopy(ren, buffer, NULL, NULL);
       SDL_RenderPresent(ren);

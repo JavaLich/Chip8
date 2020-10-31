@@ -40,7 +40,7 @@ uint8_t fontset[NUM_FONTS][FONT_SIZE] = {
 Chip8::Chip8() {
   std::random_device rd;
   mt = std::mt19937(rd());
-  dist = std::uniform_int_distribution<uint32_t>(0, 255);
+  dist = std::uniform_int_distribution<uint8_t>(0, 255);
 
   pc = START_ADDRESS;
 
@@ -67,17 +67,14 @@ void Chip8::load_rom(const char *filename) {
 
 void Chip8::step() { 
     opcode = (memory[pc] << 8) | memory[pc + 1];
-    //std::cout << std::hex << opcode << std::endl;
-    for (int y = 0; y < VIDEO_HEIGHT; y++) {
-        for (int x = 0; x < VIDEO_HEIGHT; x++) {
-            if (video[x + y * VIDEO_HEIGHT] != 0x0 || video[x + y * VIDEO_HEIGHT] != 0xFFFFFFFF) {
-                std::cout << x << ", " << y << std::endl;
-            }
-        }       
-    }
+
     pc += 2; 
+
     if (delayTimer > 0) 
         delayTimer--;
+    if (soundTimer > 0)
+        soundTimer--;
+
     if (opcode == 0x00E0) OP_00E0();
     else if (opcode == 0x00EE) OP_00EE();
     else if (opcode >> 12 == 0x1) OP_1nnn();
@@ -115,7 +112,7 @@ void Chip8::step() {
     else {
         std::cout << std::hex << opcode << std::endl;
         std::cout << "Error: unknown opcode" << std::endl;
-    }
+    } 
 }
 
 void Chip8::OP_00E0() { 
@@ -127,8 +124,9 @@ void Chip8::OP_00EE() {
 }
 
 void Chip8::OP_1nnn() { 
-	stack[sp++] = pc;
-	pc = opcode & 0x0FFF;
+    uint16_t address = opcode & 0x0FFF;
+
+	pc = address;
 }
 
 void Chip8::OP_2nnn() {
@@ -324,10 +322,11 @@ void Chip8::OP_Dxyn() {
       }
 
       uint8_t pixel = video[y * 64 + x] == 0xFFFFFFFF ? 1 : 0;
-
-      video[y * 64 + x] = (bit ^ pixel) == 1 ? 0xFFFFFFFF : 0x00000000;
-
-      if (video[y * 64 + x] == 0xFFFFFFFF && bit == 1)
+      if ((bit ^ pixel) == 1)
+          video[y * 64 + x] = 0xFFFFFFFF;
+      else 
+          video[y * 64 + x] = 0;
+      if (video[y * 64 + x] && bit == 1)
         collided = true;
       byte >>= 1;
     }
