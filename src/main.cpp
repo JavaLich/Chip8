@@ -1,8 +1,10 @@
 #include <SDL2/SDL.h>
 #include <SDL_error.h>
 #include <SDL_events.h>
+#include <SDL_keycode.h>
 #include <SDL_render.h>
 #include <iostream>
+#include <chrono>
 
 #include "Chip8.h"
 
@@ -37,15 +39,21 @@ int main() {
   SDL_Texture *buffer = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, 64, 32);
 
   bool shouldStep = false;
+  auto lastCycleTime = std::chrono::high_resolution_clock::now();
   while (true) {
     if (shouldStep) {
-      chip.step();
-      if (SDL_UpdateTexture(buffer, NULL, &chip.video, 64 * sizeof(uint32_t)) < 0) {
-        std::cout << SDL_GetError() << std::endl;
+      auto currentTime = std::chrono::high_resolution_clock::now();
+      float dt = std::chrono::duration<float, std::chrono::milliseconds::period>(currentTime - lastCycleTime).count();
+      if (dt > 4) {
+        lastCycleTime = currentTime;
+        chip.step();
+        if (SDL_UpdateTexture(buffer, NULL, &chip.video, 64 * sizeof(uint32_t)) < 0) {
+          std::cout << SDL_GetError() << std::endl;
+        }
+        SDL_RenderClear(ren);
+        SDL_RenderCopy(ren, buffer, NULL, NULL);
+        SDL_RenderPresent(ren);
       }
-      SDL_RenderClear(ren);
-      SDL_RenderCopy(ren, buffer, NULL, NULL);
-      SDL_RenderPresent(ren);
       //shouldStep = false;
     }
     SDL_Event event;
@@ -54,6 +62,77 @@ int main() {
         break;
       } else if (event.type == SDL_KEYDOWN) {
         shouldStep = true;
+      }
+      if (event.type == SDL_KEYDOWN) {
+        switch (event.key.keysym.sym) {
+          case SDLK_x: chip.keypad[0] = true; 
+                       break;
+          case SDLK_1: chip.keypad[1] = true; 
+                       break;
+          case SDLK_2: chip.keypad[2] = true; 
+                       break;
+          case SDLK_3: chip.keypad[3] = true; 
+                       break;
+          case SDLK_q: chip.keypad[4] = true; 
+                       break;
+          case SDLK_w: chip.keypad[5] = true; 
+                       break;
+          case SDLK_e: chip.keypad[6] = true; 
+                       break;
+          case SDLK_a: chip.keypad[7] = true; 
+                       break;
+          case SDLK_s: chip.keypad[8] = true; 
+                       break;
+          case SDLK_d: chip.keypad[9] = true; 
+                       break;
+          case SDLK_z: chip.keypad[10] = true; 
+                       break;
+          case SDLK_c: chip.keypad[11] = true; 
+                       break;
+          case SDLK_4: chip.keypad[12] = true; 
+                       break;
+          case SDLK_r: chip.keypad[13] = true; 
+                       break;
+          case SDLK_f: chip.keypad[14] = true; 
+                       break;
+          case SDLK_v: chip.keypad[15] = true; 
+                       break;
+        } 
+      } else if (event.type == SDL_KEYUP) {
+        switch (event.key.keysym.sym) {
+          case SDLK_x: chip.keypad[0] = false; 
+                       break;
+          case SDLK_1: chip.keypad[1] = false; 
+                       break;
+          case SDLK_2: chip.keypad[2] = false; 
+                       break;
+          case SDLK_3: chip.keypad[3] = false; 
+                       break;
+          case SDLK_q: chip.keypad[4] = false; 
+                       break;
+          case SDLK_w: chip.keypad[5] = false; 
+                       break;
+          case SDLK_e: chip.keypad[6] = false; 
+                       break;
+          case SDLK_a: chip.keypad[7] = false; 
+                       break;
+          case SDLK_s: chip.keypad[8] = false; 
+                       break;
+          case SDLK_d: chip.keypad[9] = false; 
+                       break;
+          case SDLK_z: chip.keypad[10] = false; 
+                       break;
+          case SDLK_c: chip.keypad[11] = false; 
+                       break;
+          case SDLK_4: chip.keypad[12] = false; 
+                       break;
+          case SDLK_r: chip.keypad[13] = false; 
+                       break;
+          case SDLK_f: chip.keypad[14] = false; 
+                       break;
+          case SDLK_v: chip.keypad[15] = false; 
+                       break;
+        }
       }
     }
   }

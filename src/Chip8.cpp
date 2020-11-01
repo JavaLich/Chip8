@@ -341,7 +341,7 @@ void Chip8::OP_Dxyn() {
 void Chip8::OP_Ex9E() {
     uint8_t Vx = (opcode & 0x0F00) >> 8;
 
-    if (keypad[Vx]) {
+    if (keypad[registers[Vx]]) {
         pc += 2;
     }
 }
@@ -349,7 +349,7 @@ void Chip8::OP_Ex9E() {
 void Chip8::OP_ExA1() {
     uint8_t Vx = (opcode & 0x0F00) >> 8;
 
-    if (!keypad[Vx]) {
+    if (!keypad[registers[Vx]]) {
         pc += 2;
     }
 }
