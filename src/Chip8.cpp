@@ -18,23 +18,26 @@ const uint8_t NUM_REGISTERS = 16;
 const uint8_t VIDEO_WIDTH = 64;
 const uint8_t VIDEO_HEIGHT = 32;
 
-uint8_t fontset[NUM_FONTS][FONT_SIZE] = {
-    {0xF0, 0x90, 0x90, 0x90, 0xF0}, // 0
-    {0x20, 0x60, 0x20, 0x20, 0x70}, // 1
-    {0xF0, 0x10, 0xF0, 0x80, 0xF0}, // 2
-    {0xF0, 0x10, 0xF0, 0x10, 0xF0}, // 3
-    {0x90, 0x90, 0xF0, 0x10, 0x10}, // 4
-    {0xF0, 0x80, 0xF0, 0x10, 0xF0}, // 5
-    {0xF0, 0x80, 0xF0, 0x90, 0xF0}, // 6
-    {0xF0, 0x10, 0x20, 0x40, 0x40}, // 7
-    {0xF0, 0x90, 0xF0, 0x90, 0xF0}, // 8
-    {0xF0, 0x90, 0xF0, 0x10, 0xF0}, // 9
-    {0xF0, 0x90, 0xF0, 0x90, 0x90}, // A
-    {0xE0, 0x90, 0xE0, 0x90, 0xE0}, // B
-    {0xF0, 0x80, 0x80, 0x80, 0xF0}, // C
-    {0xE0, 0x90, 0x90, 0x90, 0xE0}, // D
-    {0xF0, 0x80, 0xF0, 0x80, 0xF0}, // E
-    {0xF0, 0x80, 0xF0, 0x80, 0x80}  // F
+const unsigned int FONTSET_SIZE = 80;
+
+uint8_t fontset[FONTSET_SIZE] =
+{
+	0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+	0x20, 0x60, 0x20, 0x20, 0x70, // 1
+	0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+	0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+	0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+	0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+	0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+	0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+	0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+	0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+	0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+	0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+	0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+	0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+	0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+	0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
 Chip8::Chip8() {
@@ -44,7 +47,11 @@ Chip8::Chip8() {
 
   pc = START_ADDRESS;
 
-  std::copy(&fontset[0][0], &fontset[0][0] + NUM_FONTS * FONT_SIZE, &memory[FONTSET_ADDRESS]);
+  //std::copy(&fontset[0][0], &fontset[0][0] + NUM_FONTS * FONT_SIZE, &memory[FONTSET_ADDRESS]);
+
+  for (unsigned int j = 0; j < FONTSET_SIZE; ++j) {
+		memory[FONTSET_ADDRESS + j] = fontset[j];
+  }
 }
 
 uint8_t Chip8::generate_random_number() { return (uint8_t)dist(mt); }
@@ -67,6 +74,7 @@ void Chip8::load_rom(const char *filename) {
 
 void Chip8::step() { 
     opcode = (memory[pc] << 8) | memory[pc + 1];
+    //std::cout << std::hex << opcode << std::endl;
 
     pc += 2; 
 
@@ -298,8 +306,9 @@ void Chip8::OP_Dxyn() {
   uint8_t Vx = (opcode & 0x0F00) >> 8;
   uint8_t Vy = (opcode & 0x00F0) >> 4;
   uint8_t n = opcode & 0x000F;
-
+ 
   uint8_t *sprite = &memory[i];
+ 
   bool collided = false;
   for (int r = 0; r < n; r++) {
     uint8_t byte = sprite[r];
@@ -307,20 +316,20 @@ void Chip8::OP_Dxyn() {
       uint8_t bit = byte & 0x1;
       int x = registers[Vx] + c;
       int y = registers[Vy] + r;
-
-      if (y >= VIDEO_HEIGHT) {
+         
+      while (y >= VIDEO_HEIGHT) {
         y -= VIDEO_HEIGHT;
       }
-      if (x >= VIDEO_WIDTH) {
+      while (x >= VIDEO_WIDTH) {
         x -= VIDEO_WIDTH;
       }
-      if (x < 0) {
+      while (x < 0) {
           x += VIDEO_WIDTH;
       }
-      if (y < 0) {
+      while (y < 0) {
           y += VIDEO_HEIGHT;
       }
-
+ 
       uint8_t pixel = video[y * 64 + x] == 0xFFFFFFFF ? 1 : 0;
       if ((bit ^ pixel) == 1)
           video[y * 64 + x] = 0xFFFFFFFF;
@@ -331,7 +340,7 @@ void Chip8::OP_Dxyn() {
       byte >>= 1;
     }
   }
-
+ 
   if (collided) 
       registers[0xF] = 1;
   else
@@ -392,7 +401,7 @@ void Chip8::OP_Fx1E() {
 
 void Chip8::OP_Fx29() {
     uint8_t Vx = (opcode & 0x0F00) >> 8;
-    i = FONTSET_ADDRESS + registers[Vx];
+    i = FONTSET_ADDRESS + registers[Vx] * 5;
 }
 
 void Chip8::OP_Fx33() {

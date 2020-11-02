@@ -10,7 +10,7 @@
 
 int main() {
   Chip8 chip;
-  chip.load_rom("LunarLander.ch8");
+  chip.load_rom("PONG");
 
   using std::cerr;
   using std::endl;
