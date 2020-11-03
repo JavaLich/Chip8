@@ -47,11 +47,7 @@ Chip8::Chip8() {
 
   pc = START_ADDRESS;
 
-  //std::copy(&fontset[0][0], &fontset[0][0] + NUM_FONTS * FONT_SIZE, &memory[FONTSET_ADDRESS]);
-
-  for (unsigned int j = 0; j < FONTSET_SIZE; ++j) {
-		memory[FONTSET_ADDRESS + j] = fontset[j];
-  }
+  std::copy(&fontset[0], &fontset[0] + NUM_FONTS * FONT_SIZE, &memory[FONTSET_ADDRESS]);
 }
 
 uint8_t Chip8::generate_random_number() { return (uint8_t)dist(mt); }
@@ -317,18 +313,8 @@ void Chip8::OP_Dxyn() {
       int x = registers[Vx] + c;
       int y = registers[Vy] + r;
          
-      while (y >= VIDEO_HEIGHT) {
-        y -= VIDEO_HEIGHT;
-      }
-      while (x >= VIDEO_WIDTH) {
-        x -= VIDEO_WIDTH;
-      }
-      while (x < 0) {
-          x += VIDEO_WIDTH;
-      }
-      while (y < 0) {
-          y += VIDEO_HEIGHT;
-      }
+	  y %= VIDEO_HEIGHT;
+	  x %= VIDEO_WIDTH;
  
       uint8_t pixel = video[y * 64 + x] == 0xFFFFFFFF ? 1 : 0;
       if ((bit ^ pixel) == 1)
