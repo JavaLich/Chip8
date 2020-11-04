@@ -3,17 +3,24 @@
 #include <SDL_events.h>
 #include <SDL_keycode.h>
 #include <SDL_render.h>
+#include <cstdlib>
 #include <iostream>
 #include <chrono>
 
 #include "Chip8.h"
 
-int main() {
-  Chip8 chip;
-  chip.load_rom("LunarLander.ch8");
-
+int main(int argc, char* argv[]) {
   using std::cerr;
   using std::endl;
+
+  Chip8 chip;
+
+  if (argc != 2) {
+    std::cerr << "Invalid arguments" << std::endl;
+    return EXIT_FAILURE;
+  } else {
+    chip.load_rom(argv[1]);
+  }
 
   if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
     cerr << "SDL_Init Error: " << SDL_GetError() << endl;
