@@ -15,11 +15,13 @@ int main(int argc, char* argv[]) {
 
   Chip8 chip;
 
-  if (argc != 2) {
+  int delay = 4;
+  if (argc != 3) {
     std::cerr << "Invalid arguments" << std::endl;
     return EXIT_FAILURE;
   } else {
-    chip.load_rom(argv[1]);
+    delay = strtol(argv[1], nullptr, 10);
+    chip.load_rom(argv[2]);
   }
 
   if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -51,7 +53,7 @@ int main(int argc, char* argv[]) {
     if (shouldStep) {
       auto currentTime = std::chrono::high_resolution_clock::now();
       float dt = std::chrono::duration<float, std::chrono::milliseconds::period>(currentTime - lastCycleTime).count();
-      if (dt > 4) {
+      if (dt > delay) {
         lastCycleTime = currentTime;
         chip.step();
         if (SDL_UpdateTexture(buffer, NULL, &chip.video, 64 * sizeof(uint32_t)) < 0) {
