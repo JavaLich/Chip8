@@ -14,14 +14,16 @@ int main(int argc, char* argv[]) {
   using std::endl;
 
   Chip8 chip;
+  int scale = 10;
 
   int delay = 4;
-  if (argc != 3) {
+  if (argc != 4) {
     std::cerr << "Invalid arguments" << std::endl;
     return EXIT_FAILURE;
   } else {
     delay = strtol(argv[1], nullptr, 10);
-    chip.load_rom(argv[2]);
+    scale = strtol(argv[2], nullptr, 10);
+    chip.load_rom(argv[3]);
   }
 
   if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
@@ -29,7 +31,7 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  SDL_Window *win = SDL_CreateWindow("Chip8 Emulator", 0, 0, 640, 320, SDL_WINDOW_SHOWN);
+  SDL_Window *win = SDL_CreateWindow("Chip8 Emulator", 0, 0, 64 * scale, 32 * scale, SDL_WINDOW_SHOWN);
   if (win == nullptr) {
     cerr << "SDL_CreateWindow Error: " << SDL_GetError() << endl;
     return EXIT_FAILURE;

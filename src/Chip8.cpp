@@ -70,7 +70,7 @@ void Chip8::load_rom(const char *filename) {
 
 void Chip8::step() { 
     opcode = (memory[pc] << 8) | memory[pc + 1];
-    std::cout << std::hex << opcode << std::endl;
+    //std::cout << std::hex << opcode << std::endl;
 
     pc += 2; 
 
